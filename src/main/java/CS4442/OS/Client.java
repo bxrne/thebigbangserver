@@ -31,18 +31,20 @@ public class Client {
 				// send text to server form input
 				BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 				String message = reader.readLine();
+
+				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+				writer.write(message + "\n");
+				writer.flush();
+
 				if (message.equals("exit")) {
 					running = false;
-				} else {
-					BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
-					writer.write(message + "\n");
-					writer.flush();
-
-					// read response from server
-					reader = new BufferedReader(new InputStreamReader(inputStream));
-					String response = reader.readLine();
-					System.out.println("Received response: " + response);
 				}
+
+				// read response from server
+				reader = new BufferedReader(new InputStreamReader(inputStream));
+				String response = reader.readLine();
+				System.out.println("Received response: " + response);
+
 
 			}
 
