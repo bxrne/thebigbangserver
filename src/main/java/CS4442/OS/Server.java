@@ -26,7 +26,10 @@ public class Server {
 
 			// Send a response to the client
 			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
-			writer.write("Message received\n");
+			// write reversed message back to client
+			String reversedMessage = new StringBuilder(message).reverse().toString();
+			writer.write(reversedMessage + "\n");
+
 			writer.flush();
 
 			// Close the sockets
