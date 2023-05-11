@@ -3,15 +3,13 @@ package CS4442.OS;
 import java.io.*;
 import java.net.*;
 
-
 public class Client {
 	public static void main(String[] args) {
-		
-		try {
+
+		try (Socket socket = new Socket("localhost", 1234);) {
 			System.out.println("\nWelcome to the Big Bang Server");
 			System.out.println("Type /help for a list of commands\n");
 
-			Socket socket = new Socket("localhost", 1234);
 			System.out.println("Connected to localhost:1234");
 
 			InputStream inputStream = socket.getInputStream();
@@ -32,10 +30,10 @@ public class Client {
 					System.out.println("Exiting...");
 					running = false;
 					socket.close();
-				}else {
+				} else {
 					System.out.println(message);
 				}
-				
+
 			}
 
 			socket.close();
