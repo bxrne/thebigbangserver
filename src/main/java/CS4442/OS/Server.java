@@ -36,7 +36,8 @@ public class Server {
     }
 
     public static void listen(ServerSocket serverSocket) {
-        try (Socket clientSocket = serverSocket.accept()) {
+        try {
+            Socket clientSocket = serverSocket.accept();
             logger.info(
                     "Client@" + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " connected");
 

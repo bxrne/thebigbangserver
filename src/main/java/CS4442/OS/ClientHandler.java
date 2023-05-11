@@ -1,14 +1,12 @@
 package CS4442.OS;
+
 import java.io.*;
 import java.net.Socket;
-
-
 
 public class ClientHandler extends Thread {
     private Socket clientSocket;
     private Commands commands = new Commands();
     private boolean running = true;
-
 
     public ClientHandler(Socket socket) {
         this.clientSocket = socket;
@@ -17,9 +15,9 @@ public class ClientHandler extends Thread {
     @Override
     public void run() {
         try {
-                InputStream inputStream = clientSocket.getInputStream();
-                OutputStream outputStream = clientSocket.getOutputStream();
-            
+            InputStream inputStream = clientSocket.getInputStream();
+            OutputStream outputStream = clientSocket.getOutputStream();
+
             while (running) {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 
@@ -28,14 +26,15 @@ public class ClientHandler extends Thread {
                 }
 
                 String message = reader.readLine().toString();
-                System.out.println("Client@" + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " sent: " + message);
+                System.out.println(
+                        "Client@" + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " sent: " + message);
 
                 String response = commands.parse(message);
-    
+
                 PrintWriter writer = new PrintWriter(outputStream);
                 writer.println(response);
                 writer.flush();
-                
+
             }
 
             clientSocket.close();
