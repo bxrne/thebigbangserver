@@ -7,32 +7,34 @@ import java.net.*;
 public class Client {
 	public static void main(String[] args) {
 		try {
+			System.out.println("\nWelcome to the Big Bang Server");
+			System.out.println("Type /help for a list of commands\n");
+
 			Socket socket = new Socket("localhost", 1234);
-			System.out.println("Connected to server on port 1234");
+			System.out.println("Connected to localhost:1234");
 
 			InputStream inputStream = socket.getInputStream();
 			OutputStream outputStream = socket.getOutputStream();
 
-			System.out.println("Anything you type will be sent to the server and returned reversed.");
-			System.out.println("Type 'exit' to quit.\n");
-
 			boolean running = true;
 			while (running) {
 				BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-				String message = reader.readLine();
-
-				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
-				writer.write(message + "\n");
+				String message = reader.readLine().toString();
+				PrintWriter writer = new PrintWriter(outputStream);
+				writer.println(message);
 				writer.flush();
 
-				if (message.equals("exit")) {
-					running = false;
-				}else{
-					reader = new BufferedReader(new InputStreamReader(inputStream));
-					String response = reader.readLine();
-					System.out.println("Received response: " + response);
-				}
+				reader = new BufferedReader(new InputStreamReader(inputStream));
+				message = (reader.readLine().toString());
 
+				if (message.equals("exit")) {
+					System.out.println("Exiting...");
+					running = false;
+					socket.close();
+				}else {
+					System.out.println(message);
+				}
+				
 			}
 
 			socket.close();
