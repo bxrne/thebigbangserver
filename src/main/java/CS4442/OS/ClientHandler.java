@@ -28,7 +28,7 @@ public class ClientHandler extends Thread {
                 }
 
                 String message = reader.readLine().toString();
-                System.out.println("Received message from " + clientSocket.getInetAddress() + ": " + message);
+                System.out.println("Client@" + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " sent: " + message);
 
                 String response = commands.parse(message);
     

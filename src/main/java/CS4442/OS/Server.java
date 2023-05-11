@@ -8,13 +8,12 @@ public class Server {
     public static void main(String[] args) {
         try {
             ServerSocket serverSocket = new ServerSocket(1234);
-            System.out.println("Server started on port 1234");
+            System.out.println("Server@localhost:1234 started");
 
             while (serverSocket.isBound()) {
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("Client connected from " + clientSocket.getInetAddress());
+                System.out.println("Client@" + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " connected");
 
-                // Create a new thread to handle the client connection
                 ClientHandler clientHandler = new ClientHandler(clientSocket);
                 clientHandler.start();
             }
@@ -23,7 +22,7 @@ public class Server {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            System.out.println("Server stopped");
+            System.out.println("Server@localhost:1234 stopped");
         }
     }
 }
