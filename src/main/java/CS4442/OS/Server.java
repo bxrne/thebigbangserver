@@ -4,15 +4,31 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import java.util.logging.Logger;
+import java.util.logging.FileHandler;
+import java.util.logging.SimpleFormatter;
+
 public class Server {
+    private static final Logger logger = Logger.getLogger(Server.class.getName());
+
     public static void main(String[] args) {
         try {
+            FileHandler fileHandler = new FileHandler("server.log");
+            SimpleFormatter formatter = new SimpleFormatter();
+            fileHandler.setFormatter(formatter);
+            logger.addHandler(fileHandler);
+        } catch (IOException e) {
+            logger.severe(e.getMessage());          
+        }
+
+
+        try {
             ServerSocket serverSocket = new ServerSocket(1234);
-            System.out.println("Server@localhost:1234 started");
+            logger.info("Server@localhost:1234 started");
 
             while (serverSocket.isBound()) {
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("Client@" + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " connected");
+                logger.info("Client@" + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " connected");
 
                 ClientHandler clientHandler = new ClientHandler(clientSocket);
                 clientHandler.start();
@@ -20,9 +36,9 @@ public class Server {
 
             serverSocket.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.severe(e.getMessage());
         } finally {
-            System.out.println("Server@localhost:1234 stopped");
+            logger.info("Server@localhost:1234 stopped");
         }
     }
 }
