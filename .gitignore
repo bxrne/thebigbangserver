@@ -19,3 +19,5 @@ buildNumber.properties
 .vscore/
 .idea/
 .DS_Store
+.log
+.lck
