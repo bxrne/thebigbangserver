@@ -4,10 +4,3 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-    # Only include dependencies that are not managed by the parent POM
-    # and that are not plugins
-    allow:
-      - dependency-type: "direct"
-        update-type: "semver"
-        # Exclude test dependencies
-        requires: "not(dependency:scope, test)"
