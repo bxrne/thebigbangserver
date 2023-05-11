@@ -1,3 +1,5 @@
+package CS4442.OS;
+
 public class Commands {
 
 	private String[] validCommands = { "/help", "/exit", "/reverse" };
