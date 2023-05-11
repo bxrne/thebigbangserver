@@ -6,6 +6,7 @@ import java.net.*;
 
 public class Client {
 	public static void main(String[] args) {
+		
 		try {
 			System.out.println("\nWelcome to the Big Bang Server");
 			System.out.println("Type /help for a list of commands\n");
