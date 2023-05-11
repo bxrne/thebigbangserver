@@ -1,4 +1,4 @@
-# The Big Band Server
+# The Big Bang Server
 
 ## Description
 This project is a multithreaded server that can handle multiple clients at once. 
