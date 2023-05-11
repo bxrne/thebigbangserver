@@ -18,27 +18,33 @@ public class Server {
             fileHandler.setFormatter(formatter);
             logger.addHandler(fileHandler);
         } catch (IOException e) {
-            logger.severe(e.getMessage());          
+            logger.severe(e.getMessage());
         }
 
-
-        try {
-            ServerSocket serverSocket = new ServerSocket(1234);
+        try (ServerSocket serverSocket = new ServerSocket(1234)) {
             logger.info("Server@localhost:1234 started");
 
             while (serverSocket.isBound()) {
-                Socket clientSocket = serverSocket.accept();
-                logger.info("Client@" + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " connected");
-
-                ClientHandler clientHandler = new ClientHandler(clientSocket);
-                clientHandler.start();
+                listen(serverSocket);
             }
-
-            serverSocket.close();
         } catch (IOException e) {
             logger.severe(e.getMessage());
-        } finally {
-            logger.info("Server@localhost:1234 stopped");
+        }
+
+        logger.info("Server@localhost:1234 stopped");
+
+    }
+
+    private static void listen(ServerSocket serverSocket) {
+        try (Socket clientSocket = serverSocket.accept()) {
+            logger.info(
+                    "Client@" + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " connected");
+
+            ClientHandler clientHandler = new ClientHandler(clientSocket);
+            clientHandler.start();
+        } catch (IOException e) {
+            logger.severe(e.getMessage());
         }
     }
+
 }
