@@ -29,14 +29,11 @@ public class Client {
 				if (message.equals("exit")) {
 					System.out.println("Exiting...");
 					running = false;
-					socket.close();
 				} else {
 					System.out.println(message);
 				}
 
 			}
-
-			socket.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

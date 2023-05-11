@@ -25,15 +25,7 @@ public class Server {
             logger.info("Server@localhost:1234 started");
 
             while (serverSocket.isBound()) {
-                try (Socket clientSocket = serverSocket.accept()) {
-                    logger.info(
-                            "Client@" + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " connected");
-
-                    ClientHandler clientHandler = new ClientHandler(clientSocket);
-                    clientHandler.start();
-                } catch (IOException e) {
-                    logger.severe(e.getMessage());
-                }
+                listen(serverSocket);
             }
         } catch (IOException e) {
             logger.severe(e.getMessage());
@@ -42,4 +34,17 @@ public class Server {
         logger.info("Server@localhost:1234 stopped");
 
     }
+
+    private static void listen(ServerSocket serverSocket) {
+        try (Socket clientSocket = serverSocket.accept()) {
+            logger.info(
+                    "Client@" + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " connected");
+
+            ClientHandler clientHandler = new ClientHandler(clientSocket);
+            clientHandler.start();
+        } catch (IOException e) {
+            logger.severe(e.getMessage());
+        }
+    }
+
 }
