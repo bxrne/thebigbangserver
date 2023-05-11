@@ -18,3 +18,4 @@ buildNumber.properties
 
 .vscore/
 .idea/
+.DS_Store
