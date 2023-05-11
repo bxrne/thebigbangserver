@@ -21,7 +21,18 @@ public class Commands {
 		return new StringBuilder(message).reverse().toString();
 	}
 
-	public String execute(String command, String message) {
+	public String parse(String command) {
+		String commandInput = command.split(" ")[0].trim();
+		String commandPayload = command.substring(command.indexOf(" ") + 1).trim();
+
+		if (isValidCommand(commandInput)) {
+			return execute(commandInput, commandPayload);
+		} else {
+			return "Invalid command";
+		}
+	}
+
+	private String execute(String command, String message) {
 		switch (command) {
 			case "/help":
 				return getHelp();

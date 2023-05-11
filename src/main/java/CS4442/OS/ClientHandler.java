@@ -24,15 +24,13 @@ public class ClientHandler extends Thread {
                 String message = reader.readLine().toString();
                 System.out.println("Received message from " + clientSocket.getInetAddress() + ": " + message);
 
-                String[] messageParts = message.split(" ");
-                String command = messageParts[0];
-                String commandMessage = messageParts.length > 1 ? messageParts[1] : "";
+                
 
-                String response = commands.execute(command, commandMessage);
-        
-                    PrintWriter writer = new PrintWriter(outputStream);
-                    writer.println(response);
-                    writer.flush();
+                String response = commands.parse(message);
+    
+                PrintWriter writer = new PrintWriter(outputStream);
+                writer.println(response);
+                writer.flush();
                 
             }
 
