@@ -1,7 +1,13 @@
-
 version: 2
 updates:
-  - package-ecosystem: "" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: "maven"
+    directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
+    # Only include dependencies that are not managed by the parent POM
+    # and that are not plugins
+    allow:
+      - dependency-type: "direct"
+        update-type: "semver"
+        # Exclude test dependencies
+        requires: "not(dependency:scope, test)"
