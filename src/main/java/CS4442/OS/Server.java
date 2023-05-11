@@ -35,7 +35,7 @@ public class Server {
 
     }
 
-    private static void listen(ServerSocket serverSocket) {
+    public static void listen(ServerSocket serverSocket) {
         try (Socket clientSocket = serverSocket.accept()) {
             logger.info(
                     "Client@" + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " connected");
