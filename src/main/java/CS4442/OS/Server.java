@@ -10,7 +10,7 @@ public class Server {
             ServerSocket serverSocket = new ServerSocket(1234);
             System.out.println("Server started on port 1234");
 
-            while (true) {
+            while (serverSocket.isBound()) {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Client connected from " + clientSocket.getInetAddress());
 
@@ -18,8 +18,12 @@ public class Server {
                 ClientHandler clientHandler = new ClientHandler(clientSocket);
                 clientHandler.start();
             }
+
+            serverSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            System.out.println("Server stopped");
         }
     }
 }

@@ -7,6 +7,8 @@ import java.net.Socket;
 public class ClientHandler extends Thread {
     private Socket clientSocket;
     private Commands commands = new Commands();
+    private boolean running = true;
+
 
     public ClientHandler(Socket socket) {
         this.clientSocket = socket;
@@ -15,16 +17,18 @@ public class ClientHandler extends Thread {
     @Override
     public void run() {
         try {
-            InputStream inputStream = clientSocket.getInputStream();
-            OutputStream outputStream = clientSocket.getOutputStream();
-
-            boolean running = true;
+                InputStream inputStream = clientSocket.getInputStream();
+                OutputStream outputStream = clientSocket.getOutputStream();
+            
             while (running) {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                if (reader.ready() == false) {
+                    continue;
+                }
+
                 String message = reader.readLine().toString();
                 System.out.println("Received message from " + clientSocket.getInetAddress() + ": " + message);
-
-                
 
                 String response = commands.parse(message);
     
