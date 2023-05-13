@@ -137,7 +137,7 @@ public class Server implements Runnable {
                                 }
 
                                 if (signal == ServerSignals.LIST) {
-                                    Message listMsg = new Message("Server", "Connected clients: " + clients.size());
+                                    Message listMsg = new Message("Server", clients.size() + " online");
                                     out.println(listMsg);
                                 }
 
