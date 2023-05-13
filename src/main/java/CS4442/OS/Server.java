@@ -28,6 +28,7 @@ public class Server implements Runnable {
                 ClientHandler clientHandler = new ClientHandler(clientSocket);
                 clients.add(clientHandler);
                 pool.execute(clientHandler);
+
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -72,8 +73,7 @@ public class Server implements Runnable {
                 out = new PrintWriter(socket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-                out.println("The Big Bang Server");
-                out.println("Enter a nickname: ");
+                out.println("The Big Bang Server\nEnter a nickname: ");
 
                 String nickname = in.readLine(); // TODO: validate nickname
                 System.out.println("New client connected: " + nickname);
@@ -82,7 +82,7 @@ public class Server implements Runnable {
                 // listen for messages from client
                 String message;
                 while ((message = in.readLine()) != null) {
-                    if (message.equals("/exit")) {
+                    if (message.equals("/quit")) {
                         System.out.println(nickname + " has left the chat");
                         broadcast(nickname + " has left the chat");
                         shutdown();

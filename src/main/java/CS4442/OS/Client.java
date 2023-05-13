@@ -59,6 +59,7 @@ public class Client implements Runnable {
 					String userInput = stdIn.readLine();
 					if (userInput.equals("/quit")) {
 						stdIn.close();
+						out.println(userInput);
 						shutdown();
 					} else {
 						out.println(userInput); // send to server
