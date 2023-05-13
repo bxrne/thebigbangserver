@@ -27,6 +27,7 @@ public class Message implements Serializable {
     }
 
     public boolean validate() {
-        return from != null && body != null;
+
+        return from != null && body != null && !from.isEmpty() && !body.isEmpty();
     }
 }

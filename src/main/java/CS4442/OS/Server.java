@@ -93,7 +93,7 @@ public class Server implements Runnable {
                 String nickname = in.readLine(); // TODO: validate nickname
 
                 Message welcomeMsg = new Message("Server", "Welcome to the chat, " + nickname);
-                System.out.println(welcomeMsg);
+                System.out.println("[joined]: " + nickname);
                 broadcast(welcomeMsg);
 
                 String message;
@@ -105,7 +105,7 @@ public class Server implements Runnable {
                     if (msg.validate()) {
                         if (msg.getBody().equals("/quit")) {
                             Message quitMsg = new Message(nickname, "has left the chat");
-                            System.out.println(nickname + " has left the chat");
+                            System.out.println("[quit]: " + nickname);
                             broadcast(quitMsg);
                             shutdown();
                             break;
