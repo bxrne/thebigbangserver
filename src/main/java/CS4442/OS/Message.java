@@ -25,6 +25,21 @@ public class Message {
     }
 
     public boolean validate() {
-        return from != null && body != null && !from.isEmpty() && !body.isEmpty();
+        // if null
+        if (from == null || body == null) {
+            return false;
+        }
+
+        // if empty
+        if (from.isEmpty() || body.isEmpty()) {
+            return false;
+        }
+
+        // if whitespace
+        if (from.trim().isEmpty() || body.trim().isEmpty()) {
+            return false;
+        }
+
+        return true;
     }
 }
