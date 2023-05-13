@@ -73,7 +73,7 @@ public class Server implements Runnable {
         }
     }
 
-    public class ClientHandler extends Thread {
+    public class ClientHandler implements Runnable {
         private Socket socket;
         private BufferedReader in;
         private PrintWriter out;
