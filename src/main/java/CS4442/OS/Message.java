@@ -2,7 +2,7 @@ package CS4442.OS;
 
 import java.io.Serializable;
 
-public class Message implements Serializable {
+public class Message {
     private String from;
     private String body;
 
