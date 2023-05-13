@@ -69,13 +69,16 @@ public class Client implements Runnable {
 
 				while (running) {
 					ClientMessage clientMessage = new ClientMessage(stdIn.readLine());
+					if (clientMessage.validate()) {
+						String userInput = clientMessage.getBody();
 
-					if (clientMessage.equals("/quit")) {
-						stdIn.close();
-						out.println(clientMessage);
-						shutdown();
-					} else {
-						out.println(clientMessage); // send to server
+						if (userInput.equals("/quit")) {
+							stdIn.close();
+							out.println(userInput);
+							shutdown();
+						} else {
+							out.println(userInput); // send to server
+						}
 					}
 				}
 
