@@ -5,23 +5,22 @@ import java.net.*;
 import java.util.logging.Logger;
 
 public class Client implements Runnable {
-	private Socket client;
+	private Socket clientSocket;
 	private PrintWriter out;
 	private BufferedReader in;
 	private boolean running = true;
-	private InputHandler inputHandler;
 	private Thread inputThread;
 	private Logger logger = Logger.getLogger(Client.class.getName());
 
 	@Override
 	public void run() {
 		try {
-			client = new Socket("localhost", 1234);
+			clientSocket = new Socket("localhost", 1234);
 
-			out = new PrintWriter(client.getOutputStream(), true);
-			in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+			out = new PrintWriter(clientSocket.getOutputStream(), true);
+			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-			inputHandler = new InputHandler();
+			InputHandler inputHandler = new InputHandler();
 			inputThread = new Thread(inputHandler);
 			inputThread.start();
 
@@ -38,7 +37,7 @@ public class Client implements Runnable {
 			inputThread.join();
 			in.close();
 			out.close();
-			client.close();
+			clientSocket.close();
 
 		} catch (IOException | InterruptedException e) {
 			logger.warning("Client shutting down");
@@ -53,8 +52,8 @@ public class Client implements Runnable {
 			running = false;
 			in.close();
 			out.close();
-			if (!client.isClosed()) {
-				client.close();
+			if (!clientSocket.isClosed()) {
+				clientSocket.close();
 			}
 		} catch (IOException e) {
 			logger.warning("Client shutting down");
@@ -93,7 +92,7 @@ public class Client implements Runnable {
 		client.run();
 
 		try {
-			client.client.close();
+			client.clientSocket.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
