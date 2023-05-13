@@ -1,51 +1,129 @@
 package CS4442.OS;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import java.util.logging.Logger;
-import java.util.logging.FileHandler;
-import java.util.logging.SimpleFormatter;
+public class Server implements Runnable {
+    private ArrayList<ClientHandler> clients = new ArrayList<ClientHandler>();
+    private ServerSocket serverSocket;
+    private boolean running = true;
+    private ExecutorService pool;
 
-public class Server {
-    private static final Logger logger = Logger.getLogger(Server.class.getName());
-
-    public static void main(String[] args) {
+    @Override
+    public void run() {
+        System.out.println("Server started");
         try {
-            FileHandler fileHandler = new FileHandler("server.log");
-            SimpleFormatter formatter = new SimpleFormatter();
-            fileHandler.setFormatter(formatter);
-            logger.addHandler(fileHandler);
-        } catch (IOException e) {
-            logger.severe(e.getMessage());
-        }
-
-        try (ServerSocket serverSocket = new ServerSocket(1234)) {
-            logger.info("Server@localhost:1234 started");
-
-            while (serverSocket.isBound()) {
-                listen(serverSocket);
+            serverSocket = new ServerSocket(1234);
+            pool = Executors.newCachedThreadPool();
+            while (running) {
+                Socket clientSocket = serverSocket.accept();
+                ClientHandler clientHandler = new ClientHandler(clientSocket);
+                clients.add(clientHandler);
+                pool.execute(clientHandler);
             }
         } catch (IOException e) {
-            logger.severe(e.getMessage());
+            e.printStackTrace();
         }
-
-        logger.info("Server@localhost:1234 stopped");
 
     }
 
-    public static void listen(ServerSocket serverSocket) {
+    public void shutdown() {
         try {
-            Socket clientSocket = serverSocket.accept();
-            logger.info(
-                    "Client@" + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " connected");
+            running = false;
+            if (!serverSocket.isClosed()) {
+                serverSocket.close();
+            }
 
-            ClientHandler clientHandler = new ClientHandler(clientSocket);
-            clientHandler.start();
+            for (ClientHandler client : clients) {
+                client.shutdown();
+            }
+
         } catch (IOException e) {
-            logger.severe(e.getMessage());
+            e.printStackTrace();
         }
     }
 
+    public void broadcast(String message) {
+        for (ClientHandler client : clients) {
+            client.send(message);
+        }
+    }
+
+    public class ClientHandler extends Thread {
+        private Socket socket;
+        private BufferedReader in;
+        private PrintWriter out;
+
+        public ClientHandler(Socket socket) {
+            this.socket = socket;
+        }
+
+        @Override
+        public void run() {
+            try {
+                out = new PrintWriter(socket.getOutputStream(), true);
+                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+                out.println("The Big Bang Server");
+                out.println("Enter a nickname: ");
+
+                String nickname = in.readLine(); // TODO: validate nickname
+                System.out.println("New client connected: " + nickname);
+                broadcast(nickname + " has joined the chat");
+
+                // listen for messages from client
+                String message;
+                while ((message = in.readLine()) != null) {
+                    if (message.equals("/exit")) {
+                        System.out.println(nickname + " has left the chat");
+                        broadcast(nickname + " has left the chat");
+                        shutdown();
+                        break;
+                    }
+
+                    System.out.println(nickname + ": " + message);
+                    broadcast(nickname + ": " + message);
+                }
+
+            } catch (Exception e) {
+                shutdown();
+                e.printStackTrace();
+            }
+        }
+
+        public void send(String message) {
+            out.println(message);
+        }
+
+        public void shutdown() {
+            try {
+                if (!socket.isClosed()) {
+                    socket.close(); // close any open clients on server shutdown
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    public static void main(String[] args) {
+        Server server = new Server();
+        Thread serverThread = new Thread(server);
+        serverThread.start();
+
+        try {
+            serverThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -3,39 +3,79 @@ package CS4442.OS;
 import java.io.*;
 import java.net.*;
 
-public class Client {
-	public static void main(String[] args) {
+public class Client implements Runnable {
+	private Socket client;
+	private PrintWriter out;
+	private BufferedReader in;
+	private boolean running = true;
 
-		try (Socket socket = new Socket("localhost", 1234);) {
-			System.out.println("\nWelcome to the Big Bang Server");
-			System.out.println("Type /help for a list of commands\n");
+	@Override
+	public void run() {
+		try {
+			client = new Socket("localhost", 1234);
 
-			System.out.println("Connected to localhost:1234");
+			out = new PrintWriter(client.getOutputStream(), true);
+			in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 
-			InputStream inputStream = socket.getInputStream();
-			OutputStream outputStream = socket.getOutputStream();
+			InputHandler inputHandler = new InputHandler();
+			Thread inputThread = new Thread(inputHandler);
+			inputThread.start();
 
-			boolean running = true;
+			String serverResponse;
 			while (running) {
-				BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-				String message = reader.readLine().toString();
-				PrintWriter writer = new PrintWriter(outputStream);
-				writer.println(message);
-				writer.flush();
+				serverResponse = in.readLine();
 
-				reader = new BufferedReader(new InputStreamReader(inputStream));
-				message = (reader.readLine().toString());
-
-				if (message.equals("exit")) {
-					System.out.println("Exiting...");
-					running = false;
-				} else {
-					System.out.println(message);
+				if (serverResponse != null) {
+					System.out.println(serverResponse);
 				}
+			}
 
+		} catch (IOException e) {
+			shutdown();
+			e.printStackTrace();
+		}
+	}
+
+	public void shutdown() {
+		try {
+			running = false;
+			in.close();
+			out.close();
+			if (!client.isClosed()) {
+				client.close();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+
+	class InputHandler implements Runnable {
+		@Override
+		public void run() {
+			try {
+				BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
+
+				while (running) {
+					String userInput = stdIn.readLine();
+					if (userInput.equals("/quit")) {
+						stdIn.close();
+						shutdown();
+					} else {
+						out.println(userInput); // send to server
+					}
+				}
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	public static void main(String[] args) {
+		Client client = new Client();
+		Thread clientThread = new Thread(client);
+		clientThread.start();
+	}
+
 }
