@@ -112,6 +112,9 @@ public class Server implements Runnable {
                         "[joined]: " + nickname + " (" + socket.getInetAddress() + ":" + socket.getPort() + ")");
                 broadcast(welcomeMsg);
 
+                Message infoMsg = new Message("Server", "Type /help for a list of commands");
+                out.println(infoMsg);
+
                 String message;
                 while ((message = in.readLine()) != null) {
 

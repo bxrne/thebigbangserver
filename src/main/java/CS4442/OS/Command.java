@@ -31,6 +31,7 @@ public class Command {
     }
 
     public ServerSignals execute(PrintWriter out) {
+
         switch (command) {
             case "quit":
                 return ServerSignals.QUIT;
