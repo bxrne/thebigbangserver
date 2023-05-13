@@ -68,14 +68,14 @@ public class Client implements Runnable {
 				BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 
 				while (running) {
-					String userInput = stdIn.readLine();
+					ClientMessage clientMessage = new ClientMessage(stdIn.readLine());
 
-					if (userInput.equals("/quit")) {
+					if (clientMessage.equals("/quit")) {
 						stdIn.close();
-						out.println(userInput);
+						out.println(clientMessage);
 						shutdown();
 					} else {
-						out.println(userInput); // send to server
+						out.println(clientMessage); // send to server
 					}
 				}
 
