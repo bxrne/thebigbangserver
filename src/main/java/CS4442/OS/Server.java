@@ -49,9 +49,11 @@ public class Server implements Runnable {
     }
 
     public void shutdown() {
+        Message shutdownMsg = new Message("Server", "shutting down");
+
         try {
             running = false;
-            broadcast("Server shutting down");
+            broadcast(shutdownMsg);
             if (!serverSocket.isClosed()) {
                 serverSocket.close();
             }
@@ -65,7 +67,7 @@ public class Server implements Runnable {
         }
     }
 
-    public void broadcast(String message) {
+    public void broadcast(Message message) {
         for (ClientHandler client : clients) {
             client.send(message);
         }
@@ -89,21 +91,33 @@ public class Server implements Runnable {
                 out.println("The Big Bang Server\nEnter a nickname: ");
 
                 String nickname = in.readLine(); // TODO: validate nickname
-                System.out.println("New client connected: " + nickname);
-                broadcast(nickname + " has joined the chat");
 
-                // listen for messages from client
+                Message welcomeMsg = new Message("Server", "Welcome to the chat, " + nickname);
+                System.out.println(welcomeMsg);
+                broadcast(welcomeMsg);
+
                 String message;
                 while ((message = in.readLine()) != null) {
-                    if (message.equals("/quit")) {
-                        System.out.println(nickname + " has left the chat");
-                        broadcast(nickname + " has left the chat");
-                        shutdown();
-                        break;
+
+                    Message msg = new Message(nickname, message);
+
+                    // handle illegal messages
+                    if (msg.validate()) {
+                        if (msg.getBody().equals("/quit")) {
+                            Message quitMsg = new Message(nickname, "has left the chat");
+                            System.out.println(nickname + " has left the chat");
+                            broadcast(quitMsg);
+                            shutdown();
+                            break;
+                        }
+
+                        System.out.println(msg);
+                        broadcast(msg);
+
+                    } else {
+                        continue; // skip illegal messages
                     }
 
-                    System.out.println(nickname + ": " + message);
-                    broadcast(nickname + ": " + message);
                 }
 
             } catch (Exception e) {
@@ -112,7 +126,7 @@ public class Server implements Runnable {
             }
         }
 
-        public void send(String message) {
+        public void send(Message message) {
             out.println(message);
         }
 
