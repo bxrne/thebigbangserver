@@ -2,6 +2,7 @@ package CS4442.OS;
 
 import java.io.*;
 import java.net.*;
+import java.util.logging.Logger;
 
 public class Client implements Runnable {
 	private Socket client;
@@ -10,6 +11,7 @@ public class Client implements Runnable {
 	private boolean running = true;
 	private InputHandler inputHandler;
 	private Thread inputThread;
+	private Logger logger = Logger.getLogger(Client.class.getName());
 
 	@Override
 	public void run() {
@@ -39,6 +41,7 @@ public class Client implements Runnable {
 			client.close();
 
 		} catch (IOException | InterruptedException e) {
+			logger.warning("Client shutting down");
 			inputThread.interrupt();
 			shutdown();
 			e.printStackTrace();
@@ -54,6 +57,7 @@ public class Client implements Runnable {
 				client.close();
 			}
 		} catch (IOException e) {
+			logger.warning("Client shutting down");
 			e.printStackTrace();
 		}
 	}
@@ -77,6 +81,7 @@ public class Client implements Runnable {
 				}
 
 			} catch (IOException e) {
+				logger.warning("Client shutting down");
 				e.printStackTrace();
 			}
 		}
