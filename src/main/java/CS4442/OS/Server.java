@@ -12,10 +12,9 @@ import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 public class Server implements Runnable {
-    private ArrayList<ClientHandler> clients = new ArrayList<ClientHandler>();
+    private ArrayList<ClientHandler> clients = new ArrayList<>();
     private Logger logger = Logger.getLogger(Server.class.getName());
     private ServerSocket serverSocket;
-    private ExecutorService pool;
     private boolean running = true;
 
     public static void main(String[] args) {
@@ -37,7 +36,7 @@ public class Server implements Runnable {
             serverSocket = new ServerSocket(1234);
             logger.info("Server started");
 
-            pool = Executors.newCachedThreadPool();
+            ExecutorService pool = Executors.newCachedThreadPool();
             while (running) {
                 Socket clientSocket = serverSocket.accept();
                 ClientHandler clientHandler = new ClientHandler(clientSocket);
@@ -130,7 +129,8 @@ public class Server implements Runnable {
                         broadcast(msg);
 
                     } else {
-                        continue; // skip illegal messages
+                        Message invalidMsg = new Message("Server", "Invalid message");
+                        out.println(invalidMsg);
                     }
 
                 }
