@@ -88,12 +88,22 @@ public class Server implements Runnable {
                 out = new PrintWriter(socket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-                out.println("The Big Bang Server\nEnter a nickname: ");
+                out.println("The Big Bang Server\nEnter a nickname:");
 
-                String nickname = in.readLine(); // TODO: validate nickname
+                String nickname = in.readLine();
 
                 Message welcomeMsg = new Message("Server", "Welcome to the chat, " + nickname);
-                System.out.println("[joined]: " + nickname);
+
+                // validate nickname
+                if (nickname == null || nickname.equals("")) {
+                    Message invalidMsg = new Message("Server", "Invalid nickname");
+                    out.println(invalidMsg);
+                    shutdown();
+                    return;
+                }
+
+                System.out.println(
+                        "[joined]: " + nickname + " (" + socket.getInetAddress() + ":" + socket.getPort() + ")");
                 broadcast(welcomeMsg);
 
                 String message;
