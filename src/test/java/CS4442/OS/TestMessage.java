@@ -39,4 +39,28 @@ public class TestMessage {
         assert !message.validate();
     }
 
+    @Test
+    public void testMessageEmptyFromAndBody() {
+        Message message = new Message("", "");
+        assert !message.validate();
+    }
+
+    @Test
+    public void testMessageWhitespaceFrom() {
+        Message message = new Message(" ", "test");
+        assert !message.validate();
+    }
+
+    @Test
+    public void testMessageWhitespaceBody() {
+        Message message = new Message("test", " ");
+        assert !message.validate();
+    }
+
+    @Test
+    public void testMessageWhitespaceFromAndBody() {
+        Message message = new Message(" ", " ");
+        assert !message.validate();
+    }
+
 }
