@@ -7,7 +7,6 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -16,6 +15,18 @@ public class Server implements Runnable {
     private ServerSocket serverSocket;
     private boolean running = true;
     private ExecutorService pool;
+
+    public static void main(String[] args) {
+        Server server = new Server();
+        Thread serverThread = new Thread(server);
+        serverThread.start();
+
+        try {
+            serverThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void run() {
@@ -39,6 +50,7 @@ public class Server implements Runnable {
     public void shutdown() {
         try {
             running = false;
+            broadcast("Server shutting down");
             if (!serverSocket.isClosed()) {
                 serverSocket.close();
             }
@@ -105,6 +117,9 @@ public class Server implements Runnable {
 
         public void shutdown() {
             try {
+                in.close();
+                out.close();
+
                 if (!socket.isClosed()) {
                     socket.close(); // close any open clients on server shutdown
                 }
@@ -115,15 +130,4 @@ public class Server implements Runnable {
 
     }
 
-    public static void main(String[] args) {
-        Server server = new Server();
-        Thread serverThread = new Thread(server);
-        serverThread.start();
-
-        try {
-            serverThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 }

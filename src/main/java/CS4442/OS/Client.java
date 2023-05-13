@@ -27,10 +27,16 @@ public class Client implements Runnable {
 
 				if (serverResponse != null) {
 					System.out.println(serverResponse);
+				} else {
+					shutdown();
 				}
 			}
+			inputThread.join();
+			in.close();
+			out.close();
+			client.close();
 
-		} catch (IOException e) {
+		} catch (IOException | InterruptedException e) {
 			shutdown();
 			e.printStackTrace();
 		}
@@ -76,6 +82,12 @@ public class Client implements Runnable {
 	public static void main(String[] args) {
 		Client client = new Client();
 		client.run();
-	}
 
+		try {
+			client.client.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
 }
