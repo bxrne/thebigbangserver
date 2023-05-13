@@ -11,6 +11,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
+import CS4442.OS.Command.ServerSignals;
+
 public class Server implements Runnable {
     private ArrayList<ClientHandler> clients = new ArrayList<>();
     private Logger logger = Logger.getLogger(Server.class.getName());
@@ -91,14 +93,9 @@ public class Server implements Runnable {
             try {
                 out = new PrintWriter(socket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
                 out.println("The Big Bang Server\nEnter a nickname:");
 
                 String nickname = in.readLine();
-
-                Message welcomeMsg = new Message("Server", "Welcome to the chat, " + nickname);
-
-                // validate nickname
                 if (nickname == null || nickname.equals("")) {
                     Message invalidMsg = new Message("Server", "Invalid nickname");
                     out.println(invalidMsg);
@@ -106,39 +103,55 @@ public class Server implements Runnable {
                     return;
                 }
 
-                System.out.println(
-                        "[joined]: " + nickname + " (" + socket.getInetAddress() + ":" + socket.getPort() + ")");
-                broadcast(welcomeMsg);
+                broadcast(new Message("Server", "Welcome to the chat, " + nickname));
+                out.println(new Message("Server", "Type /help for a list of commands"));
+                System.out.println(new Message("Server", nickname + " has joined the chat"));
 
                 String message;
                 while ((message = in.readLine()) != null) {
-
                     Message msg = new Message(nickname, message);
 
-                    // handle illegal messages
                     if (msg.validate()) {
-                        if (msg.getBody().equals("/quit")) {
-                            Message quitMsg = new Message(nickname, "has left the chat");
-                            System.out.println("[quit]: " + nickname);
-                            broadcast(quitMsg);
-                            shutdown();
-                            break;
+                        if (msg.getBody().charAt(0) == '/') {
+                            handleCommand(msg, nickname);
+                        } else {
+                            broadcast(msg);
                         }
 
                         System.out.println(msg);
-                        broadcast(msg);
 
                     } else {
-                        Message invalidMsg = new Message("Server", "Invalid message");
-                        out.println(invalidMsg);
+                        out.println(new Message("Server", "Invalid message"));
                     }
-
                 }
 
             } catch (Exception e) {
                 logger.warning("Client disconnected");
                 shutdown();
                 e.printStackTrace();
+            }
+        }
+
+        private void handleCommand(Message msg, String nickname) {
+            try {
+                Command command = new Command(msg.getBody().substring(1));
+                ServerSignals signal = command.execute(out);
+
+                if (signal == ServerSignals.QUIT) {
+                    Message quitMsg = new Message("Server", nickname + " has left the chat");
+                    out.println(quitMsg);
+                    shutdown();
+                    return;
+                }
+
+                if (signal == ServerSignals.LIST) {
+                    Message listMsg = new Message("Server", clients.size() + " online");
+                    out.println(listMsg);
+                }
+
+            } catch (IllegalArgumentException e) {
+                Message invalidMsg = new Message("Server", "Invalid command");
+                out.println(invalidMsg);
             }
         }
 
