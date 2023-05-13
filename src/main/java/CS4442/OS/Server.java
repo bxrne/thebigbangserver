@@ -24,6 +24,7 @@ public class Server implements Runnable {
         try {
             serverThread.join();
         } catch (InterruptedException e) {
+            serverThread.interrupt();
             e.printStackTrace();
         }
     }

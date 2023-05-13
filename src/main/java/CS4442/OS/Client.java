@@ -8,6 +8,8 @@ public class Client implements Runnable {
 	private PrintWriter out;
 	private BufferedReader in;
 	private boolean running = true;
+	private InputHandler inputHandler;
+	private Thread inputThread;
 
 	@Override
 	public void run() {
@@ -17,8 +19,8 @@ public class Client implements Runnable {
 			out = new PrintWriter(client.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 
-			InputHandler inputHandler = new InputHandler();
-			Thread inputThread = new Thread(inputHandler);
+			inputHandler = new InputHandler();
+			inputThread = new Thread(inputHandler);
 			inputThread.start();
 
 			String serverResponse;
@@ -37,6 +39,7 @@ public class Client implements Runnable {
 			client.close();
 
 		} catch (IOException | InterruptedException e) {
+			inputThread.interrupt();
 			shutdown();
 			e.printStackTrace();
 		}
