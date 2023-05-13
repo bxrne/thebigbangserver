@@ -11,6 +11,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
+import CS4442.OS.Command.ServerSignals;
+
 public class Server implements Runnable {
     private ArrayList<ClientHandler> clients = new ArrayList<>();
     private Logger logger = Logger.getLogger(Server.class.getName());
@@ -117,16 +119,34 @@ public class Server implements Runnable {
 
                     // handle illegal messages
                     if (msg.validate()) {
-                        if (msg.getBody().equals("/quit")) {
-                            Message quitMsg = new Message(nickname, "has left the chat");
-                            System.out.println("[quit]: " + nickname);
-                            broadcast(quitMsg);
-                            shutdown();
-                            break;
-                        }
 
+                        // check if '/' is the first character
+                        if (msg.getBody().charAt(0) == '/') {
+                            try {
+                                Command command = new Command(msg.getBody().substring(1));
+                                ServerSignals signal = command.execute(out);
+
+                                if (signal == ServerSignals.QUIT) {
+                                    Message quitMsg = new Message("Server", nickname + " has left the chat");
+                                    out.println(quitMsg);
+                                    shutdown();
+                                    return;
+                                }
+
+                                if (signal == ServerSignals.LIST) {
+                                    Message listMsg = new Message("Server", "Connected clients: " + clients.size());
+                                    out.println(listMsg);
+                                }
+
+                            } catch (IllegalArgumentException e) {
+                                Message invalidMsg = new Message("Server", "Invalid command");
+                                out.println(invalidMsg);
+                                continue;
+                            }
+                        } else {
+                            broadcast(msg);
+                        }
                         System.out.println(msg);
-                        broadcast(msg);
 
                     } else {
                         Message invalidMsg = new Message("Server", "Invalid message");
