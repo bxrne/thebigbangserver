@@ -1,5 +1,7 @@
 package CS4442.OS;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.PrintWriter;
 
 import org.junit.Test;
@@ -10,19 +12,20 @@ public class TestCommand {
     @Test
     public void helpCommandSignal() {
         Command command = new Command("help");
-        assert (command.execute(out) == Command.ServerSignals.HELP);
+        assertEquals(command.execute(out), Command.ServerSignals.HELP);
     }
 
     @Test
     public void listCommandSignal() {
         Command command = new Command("list");
-        assert (command.execute(out) == Command.ServerSignals.LIST);
+        assertEquals(command.execute(out), Command.ServerSignals.LIST);
     }
 
     @Test
     public void quitCommandSignal() {
         Command command = new Command("quit");
-        assert (command.execute(out) == Command.ServerSignals.QUIT);
+        assertEquals(command.execute(out), Command.ServerSignals.QUIT);
+
     }
 
     @Test

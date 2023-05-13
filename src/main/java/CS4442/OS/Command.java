@@ -3,7 +3,7 @@ package CS4442.OS;
 import java.io.PrintWriter;
 
 public class Command {
-    private String command;
+    private String rawCommand;
 
     private String[] validCommands = { "quit", "help", "list" };
 
@@ -12,17 +12,17 @@ public class Command {
     };
 
     public Command(String command) {
-        this.command = command;
+        this.rawCommand = command;
         this.validate();
     }
 
     private boolean validate() throws IllegalArgumentException {
-        if (command == null || command.isEmpty() || command.trim().isEmpty()) {
+        if (rawCommand == null || rawCommand.isEmpty() || rawCommand.trim().isEmpty()) {
             throw new IllegalArgumentException("Command cannot be null or empty");
         }
 
         for (String validCommand : validCommands) {
-            if (command.equals(validCommand)) {
+            if (rawCommand.equals(validCommand)) {
                 return true;
             }
         }
@@ -32,15 +32,18 @@ public class Command {
 
     public ServerSignals execute(PrintWriter out) {
 
-        switch (command) {
+        switch (rawCommand) {
             case "quit":
                 return ServerSignals.QUIT;
             case "help":
-                String result = "Available commands: ";
+
+                StringBuilder sb = new StringBuilder();
+
                 for (String validCommand : validCommands) {
-                    result += "/" + validCommand + " ";
+                    sb.append("/" + validCommand + " ");
                 }
-                out.println(result);
+
+                out.println(sb.toString());
                 return ServerSignals.HELP;
             case "list":
                 return ServerSignals.LIST;
@@ -51,6 +54,6 @@ public class Command {
     }
 
     public String getCommand() {
-        return command;
+        return rawCommand;
     }
 }
