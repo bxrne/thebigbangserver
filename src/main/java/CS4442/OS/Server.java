@@ -9,12 +9,14 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Logger;
 
 public class Server implements Runnable {
     private ArrayList<ClientHandler> clients = new ArrayList<ClientHandler>();
+    private Logger logger = Logger.getLogger(Server.class.getName());
     private ServerSocket serverSocket;
-    private boolean running = true;
     private ExecutorService pool;
+    private boolean running = true;
 
     public static void main(String[] args) {
         Server server = new Server();
@@ -31,9 +33,10 @@ public class Server implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("Server started");
         try {
             serverSocket = new ServerSocket(1234);
+            logger.info("Server started");
+
             pool = Executors.newCachedThreadPool();
             while (running) {
                 Socket clientSocket = serverSocket.accept();
@@ -50,6 +53,7 @@ public class Server implements Runnable {
 
     public void shutdown() {
         Message shutdownMsg = new Message("Server", "shutting down");
+        logger.info("Server shutting down");
 
         try {
             running = false;
@@ -63,6 +67,7 @@ public class Server implements Runnable {
             }
 
         } catch (IOException e) {
+            logger.warning("Server shutdown failed");
             e.printStackTrace();
         }
     }
@@ -73,7 +78,7 @@ public class Server implements Runnable {
         }
     }
 
-    public class ClientHandler extends Thread {
+    public class ClientHandler implements Runnable {
         private Socket socket;
         private BufferedReader in;
         private PrintWriter out;
@@ -131,6 +136,7 @@ public class Server implements Runnable {
                 }
 
             } catch (Exception e) {
+                logger.warning("Client disconnected");
                 shutdown();
                 e.printStackTrace();
             }
@@ -149,6 +155,7 @@ public class Server implements Runnable {
                     socket.close(); // close any open clients on server shutdown
                 }
             } catch (IOException e) {
+                logger.warning("Client shutdown failed");
                 e.printStackTrace();
             }
         }
