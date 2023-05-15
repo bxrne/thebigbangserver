@@ -135,6 +135,7 @@ public class Server implements Runnable {
 
             } catch (Exception e) {
                 Message goodbyeMsg = new Message("Server", nickname + " has left the chat");
+                broadcast(goodbyeMsg);
                 out.println(goodbyeMsg);
                 System.out.println(goodbyeMsg);
             }
