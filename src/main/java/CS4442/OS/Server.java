@@ -38,14 +38,18 @@ public class Server implements Runnable {
             serverSocket = new ServerSocket(1234);
             logger.info("Server started");
 
-            ExecutorService pool = Executors.newCachedThreadPool();
+            ExecutorService pool = Executors.newCachedThreadPool(); // will reuse old threads
             while (running) {
                 Socket clientSocket = serverSocket.accept();
                 ClientHandler clientHandler = new ClientHandler(clientSocket);
                 clients.add(clientHandler);
                 pool.execute(clientHandler);
-
             }
+
+            pool.shutdown();
+            serverSocket.close();
+            logger.info("Server stopped");
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -53,12 +57,12 @@ public class Server implements Runnable {
     }
 
     public void shutdown() {
-        Message shutdownMsg = new Message("Server", "shutting down");
         logger.info("Server shutting down");
 
         try {
             running = false;
-            broadcast(shutdownMsg);
+            broadcast(new Message("Server", "shutting down"));
+
             if (!serverSocket.isClosed()) {
                 serverSocket.close();
             }
@@ -98,8 +102,7 @@ public class Server implements Runnable {
 
                 nickname = in.readLine();
                 if (nickname == null || nickname.equals("")) {
-                    Message invalidMsg = new Message("Server", "Invalid nickname");
-                    out.println(invalidMsg);
+                    out.println(new Message("Server", "Invalid nickname"));
                     shutdown();
                     return;
                 }
@@ -141,20 +144,17 @@ public class Server implements Runnable {
                 ServerSignals signal = command.execute(out);
 
                 if (signal == ServerSignals.QUIT) {
-                    Message quitMsg = new Message("Server", nickname + " has left the chat");
-                    out.println(quitMsg);
+                    out.println(new Message("Server", nickname + " has left the chat"));
                     shutdown();
                     return;
                 }
 
                 if (signal == ServerSignals.LIST) {
-                    Message listMsg = new Message("Server", clients.size() + " online");
-                    out.println(listMsg);
+                    out.println(new Message("Server", clients.size() + " online"));
                 }
 
             } catch (IllegalArgumentException e) {
-                Message invalidMsg = new Message("Server", "Invalid command");
-                out.println(invalidMsg);
+                out.println(new Message("Server", "Bad arguments"));
             }
         }
 
