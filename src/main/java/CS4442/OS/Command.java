@@ -35,9 +35,10 @@ public class Command {
         switch (rawCommand) {
             case "quit":
                 return ServerSignals.QUIT;
-            case "help":
 
+            case "help":
                 StringBuilder sb = new StringBuilder();
+                sb.append("[HELP]: ");
 
                 for (String validCommand : validCommands) {
                     sb.append("/" + validCommand + " ");

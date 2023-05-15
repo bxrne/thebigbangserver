@@ -100,7 +100,9 @@ public class Server implements Runnable {
             try {
                 out = new PrintWriter(socket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                out.println("The Big Bang Server\nEnter a nickname:");
+                out.println(
+                        new Message("Server", "\nWelcome to THE BIG BANG SERVER\nType /help for a list of commands"));
+                out.println(new Message("Server", "Enter a nickname:"));
 
                 nickname = in.readLine();
                 if (nickname == null || nickname.equals("")) {
@@ -110,7 +112,6 @@ public class Server implements Runnable {
                 }
 
                 broadcast(new Message("Server", "Welcome to the chat, " + nickname));
-                out.println(new Message("Server", "Type /help for a list of commands"));
                 System.out.println(new Message("Server", nickname + " has joined the chat"));
 
                 String message;
@@ -135,6 +136,7 @@ public class Server implements Runnable {
 
             } catch (Exception e) {
                 Message goodbyeMsg = new Message("Server", nickname + " has left the chat");
+                clients.remove(this);
                 broadcast(goodbyeMsg);
                 out.println(goodbyeMsg);
                 System.out.println(goodbyeMsg);
@@ -153,11 +155,15 @@ public class Server implements Runnable {
                 }
 
                 if (signal == ServerSignals.LIST) {
-                    out.println(new Message("Server", clients.size() + " online"));
+                    String[] names = new String[clients.size()];
+                    for (int i = 0; i < clients.size(); i++) {
+                        names[i] = clients.get(i).nickname;
+                    }
+                    out.println(new Message("Server", clients.size() + " online - " + String.join(", ", names)));
                 }
 
             } catch (IllegalArgumentException e) {
-                out.println(new Message("Server", "Bad arguments"));
+                out.println(new Message("Server", "Invalid command"));
             }
         }
 
