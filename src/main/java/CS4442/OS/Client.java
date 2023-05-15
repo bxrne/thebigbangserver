@@ -34,6 +34,7 @@ public class Client implements Runnable {
 					shutdown();
 				}
 			}
+
 			inputThread.join();
 			in.close();
 			out.close();
