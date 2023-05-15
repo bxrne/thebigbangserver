@@ -83,6 +83,7 @@ public class Server implements Runnable {
         private Socket socket;
         private BufferedReader in;
         private PrintWriter out;
+        private String nickname;
 
         public ClientHandler(Socket socket) {
             this.socket = socket;
@@ -95,7 +96,7 @@ public class Server implements Runnable {
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 out.println("The Big Bang Server\nEnter a nickname:");
 
-                String nickname = in.readLine();
+                nickname = in.readLine();
                 if (nickname == null || nickname.equals("")) {
                     Message invalidMsg = new Message("Server", "Invalid nickname");
                     out.println(invalidMsg);
@@ -125,10 +126,12 @@ public class Server implements Runnable {
                     }
                 }
 
-            } catch (Exception e) {
-                logger.warning("Client disconnected");
                 shutdown();
-                e.printStackTrace();
+
+            } catch (Exception e) {
+                Message goodbyeMsg = new Message("Server", nickname + " has left the chat");
+                out.println(goodbyeMsg);
+                System.out.println(goodbyeMsg);
             }
         }
 
@@ -165,7 +168,7 @@ public class Server implements Runnable {
                 out.close();
 
                 if (!socket.isClosed()) {
-                    socket.close(); // close any open clients on server shutdown
+                    socket.close();
                 }
             } catch (IOException e) {
                 logger.warning("Client shutdown failed");
