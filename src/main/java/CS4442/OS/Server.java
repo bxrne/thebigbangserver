@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public class Server implements Runnable {
     public void run() {
         try {
             serverSocket = new ServerSocket(1234);
+
             logger.info("Server started");
 
             ExecutorService pool = Executors.newCachedThreadPool(); // will reuse old threads
@@ -51,7 +53,8 @@ public class Server implements Runnable {
             logger.info("Server stopped");
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.warning("Server failed to start");
+            System.exit(1);
         }
 
     }
