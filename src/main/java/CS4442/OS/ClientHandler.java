@@ -15,26 +15,32 @@ public class ClientHandler extends Thread {
     @Override
     public void run() {
         try {
+            PipedInputStream pipedInputStream = new PipedInputStream();
+            PipedOutputStream pipedOutputStream = new PipedOutputStream(pipedInputStream);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(pipedInputStream));
+
             InputStream inputStream = clientSocket.getInputStream();
             OutputStream outputStream = clientSocket.getOutputStream();
 
             while (running) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                if (reader.ready()) {
+                    String message = reader.readLine().toString();
+                    System.out.println(
+                            "Client@" + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " sent: " + message);
 
-                if (reader.ready() == false) {
-                    continue;
+                    String response = commands.parse(message);
+
+                    PrintWriter writer = new PrintWriter(outputStream);
+                    writer.println(response);
+                    writer.flush();
                 }
 
-                String message = reader.readLine().toString();
-                System.out.println(
-                        "Client@" + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " sent: " + message);
-
-                String response = commands.parse(message);
-
-                PrintWriter writer = new PrintWriter(outputStream);
-                writer.println(response);
-                writer.flush();
-
+                if (inputStream.available() > 0) {
+                    byte[] buffer = new byte[inputStream.available()];
+                    inputStream.read(buffer);
+                    pipedOutputStream.write(buffer);
+                    pipedOutputStream.flush();
+                }
             }
 
             clientSocket.close();
