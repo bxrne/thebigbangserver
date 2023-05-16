@@ -44,7 +44,7 @@ public class Client implements Runnable {
 			logger.warning("Client shutting down");
 			inputThread.interrupt();
 			shutdown();
-			e.printStackTrace();
+			// e.printStackTrace();
 		}
 	}
 
@@ -58,7 +58,7 @@ public class Client implements Runnable {
 			}
 		} catch (IOException e) {
 			logger.warning("Client shutting down");
-			e.printStackTrace();
+			// e.printStackTrace();
 		}
 	}
 
@@ -85,7 +85,7 @@ public class Client implements Runnable {
 
 			} catch (IOException e) {
 				logger.warning("Client shutting down");
-				e.printStackTrace();
+				// e.printStackTrace();
 			}
 		}
 
@@ -98,7 +98,7 @@ public class Client implements Runnable {
 		try {
 			client.clientSocket.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			// e.printStackTrace();
 		}
 
 	}

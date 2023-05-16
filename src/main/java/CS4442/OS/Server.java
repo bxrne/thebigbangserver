@@ -28,7 +28,7 @@ public class Server implements Runnable {
             serverThread.join();
         } catch (InterruptedException e) {
             serverThread.interrupt();
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 
@@ -75,7 +75,7 @@ public class Server implements Runnable {
 
         } catch (IOException e) {
             logger.warning("Server shutdown failed");
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 
@@ -205,7 +205,7 @@ public class Server implements Runnable {
                 }
             } catch (IOException e) {
                 logger.warning("Client shutdown failed");
-                e.printStackTrace();
+                // e.printStackTrace();
             }
         }
 
