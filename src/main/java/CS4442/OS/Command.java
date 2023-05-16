@@ -5,10 +5,10 @@ import java.io.PrintWriter;
 public class Command {
     private String rawCommand;
 
-    private String[] validCommands = { "quit", "help", "list", "clear", "panic" };
+    private String[] validCommands = { "quit", "help", "list", "clear", "panic", "joke" };
 
     public enum ServerSignals {
-        QUIT, LIST, HELP, CLEAR, PANIC
+        QUIT, LIST, HELP, CLEAR, PANIC, JOKE
     }
 
     public Command(String command) {
@@ -41,6 +41,9 @@ public class Command {
 
             case "panic":
                 return ServerSignals.PANIC;
+
+            case "joke":
+                return ServerSignals.JOKE;
 
             case "help":
                 return ServerSignals.HELP;
