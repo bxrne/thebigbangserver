@@ -101,7 +101,7 @@ public class Server implements Runnable {
                 out = new PrintWriter(socket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 out.println(
-                        new Message("Server", "\nWelcome to THE BIG BANG SERVER\nType /help for a list of commands"));
+                        new Message("Server", "Welcome to THE BIG BANG SERVER\nType /help for a list of commands"));
                 out.println(new Message("Server", "Enter a nickname:"));
 
                 nickname = in.readLine();
@@ -155,9 +155,8 @@ public class Server implements Runnable {
                 }
 
                 if (signal == ServerSignals.CLEAR) {
-                    // clear stdout for all clients
-                    broadcast(new Message("Server", "\033[H\033[2J"));
-                    broadcast(new Message(nickname, "cleared the chat"));
+                    out.println(new Message("Server", "\033[H\033[2J"));
+                    broadcast(new Message("Server", "your chat is cleared"));
                 }
 
                 if (signal == ServerSignals.LIST) {
