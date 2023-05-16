@@ -7,10 +7,15 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class Jokes {
+    private String urlString = "https:// v2.jokeapi.dev/joke/Miscellaneous?type=single&safe-mode";
+
+    public void setUrlString(String urlString) {
+        this.urlString = urlString;
+    }
+
     public String getJoke() {
         try {
-            URL url = new URL(
-                    "https://v2.jokeapi.dev/joke/Miscellaneous?type=single&safe-mode");
+            URL url = new URL(urlString);
 
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
