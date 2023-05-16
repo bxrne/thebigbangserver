@@ -29,7 +29,7 @@ public class Jokes {
                 String joke = jsonResponse.substring(jsonResponse.indexOf("joke") + 8,
                         jsonResponse.indexOf("flags") - 7);
 
-                joke = joke.replaceAll("\\\\n", "");
+                joke = joke.replace("\\\\n", "");
 
                 connection.disconnect();
 
@@ -43,7 +43,6 @@ public class Jokes {
             // Close the connection
         } catch (IOException e) {
             return "Failed to get joke";
-            // e.printStackTrace();
         }
     }
 
