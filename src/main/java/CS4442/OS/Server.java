@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 
 import CS4442.OS.Command.ServerSignals;
 
@@ -92,6 +94,9 @@ public class Server implements Runnable {
         private String nickname;
         private Jokes jokes = new Jokes();
 
+        private PipedInputStream inPipe = new PipedInputStream();
+        private PipedOutputStream outPipe = new PipedOutputStream();
+
         public ClientHandler(Socket socket) {
             this.socket = socket;
         }
@@ -118,7 +123,7 @@ public class Server implements Runnable {
                 String message;
                 while ((message = in.readLine()) != null) {
                     Message msg = new Message(nickname, message);
-
+                    
                     if (msg.validate()) {
                         if (msg.getBody().charAt(0) == '/') {
                             handleCommand(msg, nickname);
