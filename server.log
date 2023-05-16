@@ -1,4 +1,6 @@
-May 11, 2023 5:29:33 PM CS4442.OS.Server main
+May 16, 2023 3:21:09 PM CS4442.OS.Server main
 INFO: Server@localhost:1234 started
-May 11, 2023 5:29:38 PM CS4442.OS.Server listen
-INFO: Client@/127.0.0.1:58139 connected
+May 16, 2023 3:21:19 PM CS4442.OS.Server listen
+INFO: Client@/127.0.0.1:56534 connected
+May 16, 2023 3:21:26 PM CS4442.OS.Server listen
+INFO: Client@/127.0.0.1:56538 connected
