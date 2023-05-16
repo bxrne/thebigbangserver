@@ -10,7 +10,7 @@ public class Jokes {
     public String getJoke() {
         try {
             URL url = new URL(
-                    "https://v2.jokeapi.dev/joke/Miscellaneous?type=single&nsfw=false&racist=false&exist=false&explicit=false");
+                    "https://v2.jokeapi.dev/joke/Miscellaneous?type=single&safe-mode");
 
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
@@ -28,6 +28,8 @@ public class Jokes {
                 String jsonResponse = response.toString();
                 String joke = jsonResponse.substring(jsonResponse.indexOf("joke") + 8,
                         jsonResponse.indexOf("flags") - 7);
+
+                joke = joke.replaceAll("\\\\n", "");
 
                 connection.disconnect();
 
