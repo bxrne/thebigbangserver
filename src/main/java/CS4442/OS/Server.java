@@ -90,6 +90,7 @@ public class Server implements Runnable {
         private BufferedReader in;
         private PrintWriter out;
         private String nickname;
+        private Jokes jokes = new Jokes();
 
         public ClientHandler(Socket socket) {
             this.socket = socket;
@@ -151,11 +152,12 @@ public class Server implements Runnable {
                 switch (signal) {
                     case HELP:
                         out.println(new Message("Server", "Available commands:"));
-                        out.println(new Message("Server", "/help - display this message"));
-                        out.println(new Message("Server", "/quit - quit the chat"));
-                        out.println(new Message("Server", "/clear - clear the chat"));
                         out.println(new Message("Server", "/list - list all online users"));
+                        out.println(new Message("Server", "/joke - display a random joke"));
+                        out.println(new Message("Server", "/clear - clear the chat"));
+                        out.println(new Message("Server", "/help - display this message"));
                         out.println(new Message("Server", "/panic - clear the chat for everyone"));
+                        out.println(new Message("Server", "/quit - quit the chat"));
                         break;
 
                     case QUIT:
@@ -178,6 +180,13 @@ public class Server implements Runnable {
 
                     case PANIC:
                         broadcast(new Message("Server", "\033[H\033[2J"));
+                        out.println(new Message("Server", "chat cleared for everyone"));
+                        break;
+
+                    case JOKE:
+                        Message jokeMsg = new Message("Server", jokes.getJoke());
+                        broadcast(jokeMsg);
+                        System.out.println(jokeMsg);
                         break;
 
                     default:
