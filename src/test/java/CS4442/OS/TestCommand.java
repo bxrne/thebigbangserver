@@ -29,6 +29,12 @@ public class TestCommand {
     }
 
     @Test
+    public void clearCommandSignal() {
+        Command command = new Command("clear");
+        assertEquals(command.execute(out), Command.ServerSignals.CLEAR);
+    }
+
+    @Test
     public void invalidCommand() {
         try {
             new Command("");

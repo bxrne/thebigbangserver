@@ -154,6 +154,12 @@ public class Server implements Runnable {
                     return;
                 }
 
+                if (signal == ServerSignals.CLEAR) {
+                    // clear stdout for all clients
+                    broadcast(new Message("Server", "\033[H\033[2J"));
+                    broadcast(new Message(nickname, "cleared the chat"));
+                }
+
                 if (signal == ServerSignals.LIST) {
                     String[] names = new String[clients.size()];
                     for (int i = 0; i < clients.size(); i++) {
