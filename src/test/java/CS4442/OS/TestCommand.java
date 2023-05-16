@@ -35,6 +35,13 @@ public class TestCommand {
     }
 
     @Test
+    public void panicCommandSignal() {
+        Command command = new Command("panic");
+        assertEquals(command.execute(out), Command.ServerSignals.PANIC);
+    }
+    
+
+    @Test
     public void invalidCommand() {
         try {
             new Command("");

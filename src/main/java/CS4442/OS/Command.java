@@ -5,10 +5,10 @@ import java.io.PrintWriter;
 public class Command {
     private String rawCommand;
 
-    private String[] validCommands = { "quit", "help", "list", "clear" };
+    private String[] validCommands = { "quit", "help", "list", "clear", "panic" };
 
     public enum ServerSignals {
-        QUIT, LIST, HELP, CLEAR
+        QUIT, LIST, HELP, CLEAR, PANIC
     };
 
     public Command(String command) {
@@ -39,16 +39,12 @@ public class Command {
             case "clear":
                 return ServerSignals.CLEAR;
 
+            case "panic":
+                return ServerSignals.PANIC;
+
             case "help":
-                StringBuilder sb = new StringBuilder();
-                sb.append("[HELP]: ");
-
-                for (String validCommand : validCommands) {
-                    sb.append("/" + validCommand + " ");
-                }
-
-                out.println(sb.toString());
                 return ServerSignals.HELP;
+
             case "list":
                 return ServerSignals.LIST;
             default:

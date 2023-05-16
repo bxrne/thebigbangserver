@@ -101,7 +101,7 @@ public class Server implements Runnable {
                 out = new PrintWriter(socket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 out.println(
-                        new Message("Server", "Welcome to THE BIG BANG SERVER\nType /help for a list of commands"));
+                        new Message("Server", "Welcome to THE BIG BANG SERVER. Type /help for a list of commands"));
                 out.println(new Message("Server", "Enter a nickname:"));
 
                 nickname = in.readLine();
@@ -148,23 +148,41 @@ public class Server implements Runnable {
                 Command command = new Command(msg.getBody().substring(1));
                 ServerSignals signal = command.execute(out);
 
-                if (signal == ServerSignals.QUIT) {
-                    out.println(new Message("Server", nickname + " has left the chat"));
-                    shutdown();
-                    return;
-                }
+                switch (signal) {
+                    case HELP:
+                        out.println(new Message("Server", "Available commands:"));
+                        out.println(new Message("Server", "/help - display this message"));
+                        out.println(new Message("Server", "/quit - quit the chat"));
+                        out.println(new Message("Server", "/clear - clear the chat"));
+                        out.println(new Message("Server", "/list - list all online users"));
+                        out.println(new Message("Server", "/panic - clear the chat for everyone"));
+                        break;
 
-                if (signal == ServerSignals.CLEAR) {
-                    out.println(new Message("Server", "\033[H\033[2J"));
-                    broadcast(new Message("Server", "your chat is cleared"));
-                }
+                    case QUIT:
+                        out.println(new Message("Server", nickname + " has left the chat"));
+                        shutdown();
+                        break;
 
-                if (signal == ServerSignals.LIST) {
-                    String[] names = new String[clients.size()];
-                    for (int i = 0; i < clients.size(); i++) {
-                        names[i] = clients.get(i).nickname;
-                    }
-                    out.println(new Message("Server", clients.size() + " online - " + String.join(", ", names)));
+                    case CLEAR:
+                        out.println(new Message("Server", "\033[H\033[2J"));
+                        out.println(new Message("Server", "your chat is cleared"));
+                        break;
+
+                    case LIST:
+                        String[] names = new String[clients.size()];
+                        for (int i = 0; i < clients.size(); i++) {
+                            names[i] = clients.get(i).nickname;
+                        }
+                        out.println(new Message("Server", clients.size() + " online - " + String.join(", ", names)));
+                        break;
+
+                    case PANIC:
+                        broadcast(new Message("Server", "\033[H\033[2J"));
+                        break;
+
+                    default:
+                        out.println(new Message("Server", "Invalid command"));
+                        break;
                 }
 
             } catch (IllegalArgumentException e) {
@@ -177,6 +195,7 @@ public class Server implements Runnable {
         }
 
         public void shutdown() {
+            clients.remove(this);
             try {
                 in.close();
                 out.close();
