@@ -9,7 +9,7 @@ public class Command {
 
     public enum ServerSignals {
         QUIT, LIST, HELP, CLEAR, PANIC
-    };
+    }
 
     public Command(String command) {
         this.rawCommand = command;
