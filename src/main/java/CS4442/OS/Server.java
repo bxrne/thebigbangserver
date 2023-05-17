@@ -94,16 +94,22 @@ public class Server implements Runnable {
         private String nickname;
         private Jokes jokes = new Jokes();
 
-        private PipedInputStream inPipe = new PipedInputStream();
-        private PipedOutputStream outPipe = new PipedOutputStream();
-
+        private PipedOutputStream commandOutput;
+        private PipedInputStream commandInput;
         public ClientHandler(Socket socket) {
             this.socket = socket;
+            try {
+                this.commandOutput = new PipedOutputStream();
+                this.commandInput = new PipedInputStream(commandOutput);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
         public void run() {
             try {
+                BufferedReader commandReader = new BufferedReader(new InputStreamReader(commandInput));
                 out = new PrintWriter(socket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 out.println(
@@ -116,6 +122,7 @@ public class Server implements Runnable {
                     shutdown();
                     return;
                 }
+
 
                 broadcast(new Message("Server", "Welcome to the chat, " + nickname));
                 System.out.println(new Message("Server", nickname + " has joined the chat"));
@@ -137,6 +144,10 @@ public class Server implements Runnable {
                         out.println(new Message("Server", "Invalid message"));
                     }
                 }
+                String line;
+                while ((line = commandReader.readLine()) != null) {
+                    out.println(new Message("Server", "previous command output: " + line));
+                }
 
                 shutdown();
 
@@ -150,9 +161,10 @@ public class Server implements Runnable {
         }
 
         private void handleCommand(Message msg, String nickname) {
+            PrintWriter commandWriter = new PrintWriter(commandOutput, true);
             try {
                 Command command = new Command(msg.getBody().substring(1));
-                ServerSignals signal = command.execute(out);
+                ServerSignals signal = command.execute(commandWriter);
 
                 switch (signal) {
                     case HELP:
