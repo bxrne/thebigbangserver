@@ -5,10 +5,10 @@ import java.io.PrintWriter;
 public class Command {
     private String rawCommand;
 
-    private String[] validCommands = { "quit", "help", "list", "clear", "panic", "joke" };
+    private String[] validCommands = { "quit", "help", "list", "clear", "panic", "joke", "msg" };
 
     public enum ServerSignals {
-        QUIT, LIST, HELP, CLEAR, PANIC, JOKE
+        QUIT, LIST, HELP, CLEAR, PANIC, JOKE, MSG
     }
 
     public Command(String command) {
@@ -50,6 +50,9 @@ public class Command {
 
             case "list":
                 return ServerSignals.LIST;
+
+            case "msg":
+                return ServerSignals.MSG;
             default:
                 out.println("Command not found");
                 return null;

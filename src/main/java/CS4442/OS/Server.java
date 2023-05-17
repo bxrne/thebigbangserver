@@ -93,11 +93,13 @@ public class Server implements Runnable {
         private PrintWriter out;
         private String nickname;
         private Jokes jokes = new Jokes();
-
+        private ArrayList<ClientHandler> clients;
         private PipedOutputStream commandOutput;
         private PipedInputStream commandInput;
-        public ClientHandler(Socket socket) {
+
+        public ClientHandler(Socket socket, ArrayList<ClientHandler> clients) {
             this.socket = socket;
+            this.clients = clients;
             try {
                 this.commandOutput = new PipedOutputStream();
                 this.commandInput = new PipedInputStream(commandOutput);
@@ -128,7 +130,7 @@ public class Server implements Runnable {
                 System.out.println(new Message("Server", nickname + " has joined the chat"));
 
                 String message;
-                while ((message = in.readLine()) != null) {
+                while ((message = in.readLine()) != null){
                     Message msg = new Message(nickname, message);
                     
                     if (msg.validate()) {
@@ -142,12 +144,10 @@ public class Server implements Runnable {
 
                     } else {
                         out.println(new Message("Server", "Invalid message"));
+
                     }
                 }
-                String line;
-                while ((line = commandReader.readLine()) != null) {
-                    out.println(new Message("Server", "previous command output: " + line));
-                }
+
 
                 shutdown();
 
@@ -175,6 +175,8 @@ public class Server implements Runnable {
                         out.println(new Message("Server", "/help - display this message"));
                         out.println(new Message("Server", "/panic - clear the chat for everyone"));
                         out.println(new Message("Server", "/quit - quit the chat"));
+                        out.println(new Message("Server", "/msg - private message a user"));
+
                         break;
 
                     case QUIT:
@@ -206,6 +208,34 @@ public class Server implements Runnable {
                         System.out.println(jokeMsg);
                         break;
 
+                    case MSG:
+                        String[] tokens = command.getTokens();
+                        if (tokens.length < 2) {
+                            out.println(new Message("Server", "Invalid usage. Usage: /msg <recipient> <message>"));
+                            break;
+                        }
+                        String recipient = tokens[0];
+                        String message = String.join(" ", Arrays.copyOfRange(tokens, 1, tokens.length));
+                        boolean recipientFound = false;
+                        for (ClientHandler client : clients) {
+                            if (client.nickname.equals(recipient)) {
+                                recipientFound = true;
+                                Message privateMsg = new Message(nickname, message);
+                                try {
+                                    PipedOutputStream recipientOutput = client.commandOutput;
+                                    recipientOutput.write(privateMsg.toString().getBytes());
+                                    recipientOutput.flush();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                break;
+                            }
+                        }
+                        if (!recipientFound) {
+                            out.println(new Message("Server", "Recipient not found."));
+                        }
+                        break;
+                        
                     default:
                         out.println(new Message("Server", "Invalid command"));
                         break;
