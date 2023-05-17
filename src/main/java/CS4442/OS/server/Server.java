@@ -1,4 +1,4 @@
-package CS4442.OS;
+package CS4442.OS.server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,7 +11,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
-import CS4442.OS.Command.ServerSignals;
+import CS4442.OS.lib.Command;
+import CS4442.OS.lib.Jokes;
+import CS4442.OS.lib.Message;
+import CS4442.OS.lib.Command.ServerSignals;
 
 public class Server implements Runnable {
     private ArrayList<ClientHandler> clients = new ArrayList<>();

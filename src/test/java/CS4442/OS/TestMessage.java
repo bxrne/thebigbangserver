@@ -2,6 +2,8 @@ package CS4442.OS;
 
 import org.junit.Test;
 
+import CS4442.OS.lib.Message;
+
 public class TestMessage {
     @Test
     public void testMessage() {
