@@ -1,5 +1,9 @@
 # The Big Bang Server
 
+[![CodeQL](https://github.com/theadambyrne/thebigbangserver/actions/workflows/codeql.yml/badge.svg)](https://github.com/theadambyrne/thebigbangserver/actions/workflows/codeql.yml)
+[![Java CI with Maven](https://github.com/theadambyrne/thebigbangserver/actions/workflows/maven.yml/badge.svg)](https://github.com/theadambyrne/thebigbangserver/actions/workflows/maven.yml)
+[![SonarCloud](https://github.com/theadambyrne/thebigbangserver/actions/workflows/build.yml/badge.svg)](https://github.com/theadambyrne/thebigbangserver/actions/workflows/build.yml)
+
 ## Description
 This project is a command based groupchat application that uses Sockets, Threads and Pipes. It includes many small feature such as /joke and /panic. 
 
