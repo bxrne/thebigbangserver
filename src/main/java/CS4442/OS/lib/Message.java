@@ -1,4 +1,4 @@
-package CS4442.OS;
+package CS4442.OS.lib;
 
 public class Message {
     private String from;

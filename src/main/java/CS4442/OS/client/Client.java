@@ -1,8 +1,10 @@
-package CS4442.OS;
+package CS4442.OS.client;
 
 import java.io.*;
 import java.net.*;
 import java.util.logging.Logger;
+
+import CS4442.OS.lib.ClientMessage;
 
 public class Client implements Runnable {
 	private Socket clientSocket;

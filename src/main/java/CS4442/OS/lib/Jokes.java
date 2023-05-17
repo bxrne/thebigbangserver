@@ -1,4 +1,4 @@
-package CS4442.OS;
+package CS4442.OS.lib;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -7,7 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class Jokes {
-    private String urlString = "https:// v2.jokeapi.dev/joke/Miscellaneous?type=single&safe-mode";
+    private String urlString = "https://v2.jokeapi.dev/joke/Miscellaneous?type=single&safe-mode";
 
     public void setUrlString(String urlString) {
         this.urlString = urlString;

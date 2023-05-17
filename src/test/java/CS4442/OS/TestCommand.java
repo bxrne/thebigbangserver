@@ -6,6 +6,8 @@ import java.io.PrintWriter;
 
 import org.junit.Test;
 
+import CS4442.OS.lib.Command;
+
 public class TestCommand {
     private PrintWriter out = new PrintWriter(System.out);
 
@@ -39,7 +41,6 @@ public class TestCommand {
         Command command = new Command("panic");
         assertEquals(command.execute(out), Command.ServerSignals.PANIC);
     }
-    
 
     @Test
     public void invalidCommand() {
