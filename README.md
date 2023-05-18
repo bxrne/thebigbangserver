@@ -7,8 +7,6 @@
 ## Description
 This project is a command based groupchat application that uses Sockets, Threads and Pipes. It includes many small feature such as /joke and /panic. 
 
-## Architecture
-This project uses a Client-Server architecture with a single server and multiple clients. The server is responsible for handling all the clients and their requests. The server uses a thread pool to handle multiple clients at once. The server also uses a pipe to communicate with the client. The client is responsible for sending requests to the server and receiving responses. The client uses a thread to listen for responses from the server. The client also uses a pipe to communicate with the server.
 
 ## Features
 - Clients are free to join server, provided they know the server's IP address and port number.
