@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
+
 import CS4442.OS.lib.Command;
 import CS4442.OS.lib.Jokes;
 import CS4442.OS.lib.Message;
@@ -33,6 +34,14 @@ public class Server implements Runnable {
             serverThread.interrupt();
             // e.printStackTrace();
         }
+    }
+    public ClientHandler getClientHandlerByNickname(String nickname) {
+        for (ClientHandler client : clients) {
+            if (client.nickname.equals(nickname)) {
+                return client;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -86,7 +95,18 @@ public class Server implements Runnable {
         for (ClientHandler client : clients) {
             client.send(message);
         }
+    }   
+    private void sendDirectMessage(PrintWriter out, String sender, String recipient, String message) {
+        ClientHandler recipientHandler = getClientHandlerByNickname(recipient);
+        if (recipientHandler != null) {
+            Message dm = new Message(sender + " (DM)", message);
+            recipientHandler.send(dm);
+        } else {
+            out.println(new Message("Server", "Recipient not found: " + recipient));
+        }
     }
+    
+    
 
     public class ClientHandler implements Runnable {
         private Socket socket;
@@ -149,54 +169,65 @@ public class Server implements Runnable {
 
         private void handleCommand(Message msg, String nickname) {
             try {
-                Command command = new Command(msg.getBody().substring(1));
-                ServerSignals signal = command.execute(out);
+                if (msg.getBody().startsWith("/dm")) {
+                    String[] args = msg.getBody().substring(4).split(" ", 2);
+                    if (args.length < 2) {
+                        out.println(new Message("Server", "Usage: /dm <recipient> <message>"));
+                        return;
+                    }
+                
+                    String recipient = args[0];
+                    String messageBody = args[1];
+                    // Call the method to send the direct message
+                    sendDirectMessage(out, nickname, recipient, messageBody);
+                } else {
+                    Command command = new Command(msg.getBody().substring(1));
+                    ServerSignals signal = command.execute(out);
 
-                switch (signal) {
-                    case HELP:
-                        out.println(new Message("Server", "Available commands:"));
-                        out.println(new Message("Server", "/list - list all online users"));
-                        out.println(new Message("Server", "/joke - display a random joke"));
-                        out.println(new Message("Server", "/clear - clear the chat"));
-                        out.println(new Message("Server", "/help - display this message"));
-                        out.println(new Message("Server", "/panic - clear the chat for everyone"));
-                        out.println(new Message("Server", "/quit - quit the chat"));
-                        break;
+                    switch (signal) {
+                        case HELP:
+                            out.println(new Message("Server", "Available commands:"));
+                            out.println(new Message("Server", "/list - list all online users"));
+                            out.println(new Message("Server", "/joke - display a random joke"));
+                            out.println(new Message("Server", "/clear - clear the chat"));
+                            out.println(new Message("Server", "/help - display this message"));
+                            out.println(new Message("Server", "/panic - clear the chat for everyone"));
+                            out.println(new Message("Server", "/quit - quit the chat"));
+                            out.println(new Message("Server", "/dm - send a private message to a user"));
+                            break;
 
-                    case QUIT:
-                        out.println(new Message("Server", nickname + " has left the chat"));
-                        shutdown();
-                        break;
+                        case QUIT:
+                            out.println(new Message("Server", nickname + " has left the chat"));
+                            shutdown();
+                            break;
 
-                    case CLEAR:
-                        out.println(new Message("Server", "\033[H\033[2J"));
-                        out.println(new Message("Server", "your chat is cleared"));
-                        break;
+                        case CLEAR:
+                            out.println(new Message("Server", "\033[H\033[2J"));
+                            out.println(new Message("Server", "your chat is cleared"));
+                            break;
 
-                    case LIST:
-                        String[] names = new String[clients.size()];
-                        for (int i = 0; i < clients.size(); i++) {
-                            names[i] = clients.get(i).nickname;
-                        }
-                        out.println(new Message("Server", clients.size() + " online - " + String.join(", ", names)));
-                        break;
+                        case LIST:
+                            String[] names = new String[clients.size()];
+                            for (int i = 0; i < clients.size(); i++) {
+                                names[i] = clients.get(i).nickname;
+                            }
+                            out.println(new Message("Server", clients.size() + " online - " + String.join(", ", names)));
+                            break;
 
-                    case PANIC:
-                        broadcast(new Message("Server", "\033[H\033[2J"));
-                        out.println(new Message("Server", "chat cleared for everyone"));
-                        break;
+                        case PANIC:
+                            broadcast(new Message("Server", "\033[H\033[2J"));
+                            out.println(new Message("Server", "chat cleared for everyone"));
+                            break;
 
-                    case JOKE:
-                        Message jokeMsg = new Message("Server", jokes.getJoke());
-                        broadcast(jokeMsg);
-                        System.out.println(jokeMsg);
-                        break;
+                        case JOKE:
+                            Message jokeMsg = new Message("Server", jokes.getJoke());
+                            broadcast(jokeMsg);
+                            System.out.println(jokeMsg);
+                            break;
+                
 
-                    default:
-                        out.println(new Message("Server", "Invalid command"));
-                        break;
+            }
                 }
-
             } catch (IllegalArgumentException e) {
                 out.println(new Message("Server", "Invalid command"));
             }
