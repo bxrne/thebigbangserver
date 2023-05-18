@@ -16,12 +16,15 @@ import CS4442.OS.lib.Command;
 import CS4442.OS.lib.Jokes;
 import CS4442.OS.lib.Message;
 import CS4442.OS.lib.Command.ServerSignals;
+import CS4442.OS.lib.ServerHealth;
+
 
 public class Server implements Runnable {
     private ArrayList<ClientHandler> clients = new ArrayList<>();
     private Logger logger = Logger.getLogger(Server.class.getName());
     private ServerSocket serverSocket;
     private boolean running = true;
+    private ServerHealth serverHealth = new ServerHealth();    
 
     public static void main(String[] args) {
         Server server = new Server();
@@ -54,7 +57,7 @@ public class Server implements Runnable {
             ExecutorService pool = Executors.newCachedThreadPool(); // will reuse old threads
             while (running) {
                 Socket clientSocket = serverSocket.accept();
-                ClientHandler clientHandler = new ClientHandler(clientSocket);
+                ClientHandler clientHandler = new ClientHandler(clientSocket, this, serverHealth);
                 clients.add(clientHandler);
                 pool.execute(clientHandler);
             }
@@ -106,6 +109,9 @@ public class Server implements Runnable {
         }
     }
     
+    public ServerHealth getServerHealth() {
+        return serverHealth;
+    }
     
 
     public class ClientHandler implements Runnable {
@@ -114,9 +120,13 @@ public class Server implements Runnable {
         private PrintWriter out;
         private String nickname;
         private Jokes jokes = new Jokes();
+        private Server server;
+        private ServerHealth serverHealth;
 
-        public ClientHandler(Socket socket) {
+        public ClientHandler(Socket socket, Server server, ServerHealth serverHealth) {
             this.socket = socket;
+            this.server = server;
+            this.serverHealth = serverHealth;
         }
 
         @Override
@@ -150,9 +160,11 @@ public class Server implements Runnable {
                         }
 
                         System.out.println(msg);
+                        server.getServerHealth().incrementLogCount("info");
 
                     } else {
                         out.println(new Message("Server", "Invalid message"));
+                        server.getServerHealth().incrementLogCount("error");
                     }
                 }
 
@@ -164,6 +176,7 @@ public class Server implements Runnable {
                 broadcast(goodbyeMsg);
                 out.println(goodbyeMsg);
                 System.out.println(goodbyeMsg);
+                server.getServerHealth().incrementLogCount("error");
             }
         }
 
@@ -180,6 +193,15 @@ public class Server implements Runnable {
                     String messageBody = args[1];
                     // Call the method to send the direct message
                     sendDirectMessage(out, nickname, recipient, messageBody);
+                }
+                if (msg.getBody().startsWith("/pulse")) {
+                    server.getServerHealth().incrementLogCount("info"); // Increment info count
+                    ServerHealth serverHealth = server.getServerHealth();
+                    // Create a message with the server health information
+                    Message response = new Message("Server", "Server Health: Info - " + serverHealth.getInfoCount() +
+                            ", Warning - " + serverHealth.getWarningCount() +
+                            ", Error - " + serverHealth.getErrorCount());
+                    out.println(response);
                 } else {
                     Command command = new Command(msg.getBody().substring(1));
                     ServerSignals signal = command.execute(out);
@@ -194,6 +216,7 @@ public class Server implements Runnable {
                             out.println(new Message("Server", "/panic - clear the chat for everyone"));
                             out.println(new Message("Server", "/quit - quit the chat"));
                             out.println(new Message("Server", "/dm - send a private message to a user"));
+                            out.println(new Message("Server", "/pulse - display server health information"));
                             break;
 
                         case QUIT:
@@ -230,6 +253,7 @@ public class Server implements Runnable {
                 }
             } catch (IllegalArgumentException e) {
                 out.println(new Message("Server", "Invalid command"));
+                server.getServerHealth().incrementLogCount("warning");
             }
         }
 
