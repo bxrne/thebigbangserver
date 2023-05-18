@@ -100,10 +100,13 @@ public class Server implements Runnable {
         }
     }   
     private void sendDirectMessage(PrintWriter out, String sender, String recipient, String message) {
+        // check if recipient exists
         ClientHandler recipientHandler = getClientHandlerByNickname(recipient);
+        // if recipient exists, send message
         if (recipientHandler != null) {
             Message dm = new Message(sender + " (DM)", message);
             recipientHandler.send(dm);
+        // else, send error message 
         } else {
             out.println(new Message("Server", "Recipient not found: " + recipient));
         }
@@ -183,12 +186,13 @@ public class Server implements Runnable {
         private void handleCommand(Message msg, String nickname) {
             try {
                 if (msg.getBody().startsWith("/dm")) {
+                    // Split the message into the recipient and the message body
                     String[] args = msg.getBody().substring(4).split(" ", 2);
+                    // Check if the message is valid
                     if (args.length < 2) {
                         out.println(new Message("Server", "Usage: /dm <recipient> <message>"));
                         return;
                     }
-                
                     String recipient = args[0];
                     String messageBody = args[1];
                     // Call the method to send the direct message
